@@ -1,0 +1,557 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Assignment 1 - Optimization Methods\n",
+    "## Matteo Ghilardini\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Part 1: exercise"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "1. __What is the definition of a symmetric matrix?__<br>\n",
+    "> A matrix $M \\in R^{n \\times n}$ is symmetric if is squared, and any element of $M$ satisfy $M_{ij} == M_{ji}$ (i.e. row $x$ is equal to column $x$ $\\forall x \\ge 1 \\land x \\le n$)\n",
+    "\n",
+    "2. __What are the definitions of eigenvalues and eigenvectors?__ <br>\n",
+    "> A scalar $\\lambda$ is called **eigenvalue** of a matrix $M \\in R^{n \\times n}$ if there exist a non-zero vector $v$ (called **eigenvector**) such that holds $Mx=\\lambda x$.  \n",
+    "> In other words, a non-zero vector $v$ is called **eigenvector** if by multiplying it to a matrix $M$, it results to a scaled version of $v$ (the scaling factor is the **eigenvalue** $\\lambda$).\n",
+    "\n",
+    "3. __What is a singular matrix?__ <br>\n",
+    "> A matrix $M \\in R^{n \\times n}$ is singular if is not invertible, i.e. the determinant of $M$ is zero.\n",
+    "\n",
+    "4. __What is the definition of a positive definite matrix? definition of a positive semi- definite matrix?__ <br>\n",
+    "> A matrix $M \\in R^{n \\times n}$ is **positive defined** if it is symmetric and for all nonzero vectors $x \\in \\mathbb{R}^n$: $x^T A x > 0$; implying that all **eigenvalues** of $M$ are strictly positive.  <br>\n",
+    "> Otherwise, a matrix $M \\in R^{n \\times n}$ is **semi-positive defined** if it is symmetric and and for all nonzero vectors $x \\in \\mathbb{R}^n$: $x^T A x \\ge 0$; implying that  all **eigenvalues** of $M$ are non-negative.\n",
+    "\n",
+    "5. __Let $M \\in R^{n×n}$ a nonsingular square matrix and let $A = M^T M$ (here the supscript $^T$ means that we take the transpose). Prove that $A$ is positive definite.__ _(Hint: recall that $x^Tx=||x||^2 \\;for \\; x \\in R^n$)_\n",
+    "> In order to proove that $A$ is positive defined we have to proove that $A$ is symmetric and for all nonzero vectors $x \\in \\mathbb{R}^n$: $x^T A x > 0$  \n",
+    "> Since $A = M^T M$, we can write $x^T A x = x^T (M^T M) x > 0$  \n",
+    "> By associativity become $x^T (M^T M) x = (M x)^T (M x)$  \n",
+    "> Since $Mx$ is a vector, the doct product between a vector and itself (or in this case, itself transposed) is equivalent to the squared norm: $|Mx|^2$  \n",
+    "> Since $M x$ is nonzero for any nonzero $x$, the squared norm $\\| M x \\|^2 > 0$ for all $x \\neq 0$. Thus, $x^T A x > 0$, **proving that $A$ is positive definite**."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Part 2: programming problem"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Setup the environment:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Install numpy in the jupiter notebook environment:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Requirement already satisfied: numpy in /Users/ghila/.pyenv/versions/3.10.12/lib/python3.10/site-packages (2.2.3)\n",
+      "Note: you may need to restart the kernel to use updated packages.\n"
+     ]
+    }
+   ],
+   "source": [
+    "pip install numpy"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Import _numpy_ library"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Programming solutions"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### 1. Create a vector b with the elements\n",
+    "$ b=\n",
+    "    \\begin{bmatrix}\n",
+    "        -3 \\\\\n",
+    "        -8 \\\\\n",
+    "        7\n",
+    "    \\end{bmatrix}\n",
+    "$\n",
+    "and print it."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[-3]\n",
+      " [-8]\n",
+      " [ 7]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "b = np.array([[-3, -8, 7]]) # 2D vector array, i.e. matrix with 1 row and 3 columns\n",
+    "b = b.T # Convert the 2D array from a matrix 1x3 to a matrix 3x1, i.e. a column vector\n",
+    "print(b)\n",
+    "# Otherwise the same result can also be obtained by using the following code, but \n",
+    "#  is simply a vector without consider if is row-vector or column-vector:\n",
+    "# b = np.array([-3, -8, 7])\n",
+    "# print(b)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### 2. Create a matrix A with the elements \n",
+    "$ A=\n",
+    "    \\begin{bmatrix}\n",
+    "        -10 & 3 & 11 \\\\\n",
+    "        3 & -5 & -4 \\\\\n",
+    "        11 & -4 & -7\n",
+    "    \\end{bmatrix}\n",
+    "$\n",
+    "and print it."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[-10   3  11]\n",
+      " [  3  -5  -4]\n",
+      " [ 11  -4  -7]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "A = np.array([\n",
+    "    [-10, 3, 11], \n",
+    "    [3, -5, -4], \n",
+    "    [11, -4, -7]\n",
+    "]) # 2D array, i.e. matrix with 3 rows and 3 columns\n",
+    "print(A)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### 3. Is the matrix A symmetric? Write your answer in a cell in the notebook and then check it with Python."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "*Yes, a matrix $M$ is symmetric when $M = M^T$, or in other words, any element of $M$ $M_{ij}$ is equal to the element $M_{ji}$. Here is the check:*"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "True\n"
+     ]
+    }
+   ],
+   "source": [
+    "def is_symmetric(matrix):\n",
+    "    return np.array_equal(matrix, matrix.T)\n",
+    "\n",
+    "print(is_symmetric(A))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### 4. Compute $x$ as the solution of the linear system $Ax = b$ and print it."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[2.]\n",
+      " [2.]\n",
+      " [1.]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "x = np.linalg.solve(A,b)\n",
+    "print(x)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### 5. To check if the solution is correct, compute $r$ as the product $Ax$ and print it."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[-3.]\n",
+      " [-8.]\n",
+      " [ 7.]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "# I first tryed using r=A*x, but then i found out that this performs a element-wise \n",
+    "#   multiplication, not a matrix multiplication. So I've searched on numpy documentation, \n",
+    "#   and found out that np.dot() is the function to use for matrix multiplication.\n",
+    "r = np.dot(A, x) \n",
+    "print(r)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### 6. Print the difference of $r$ and $b$ as $r−b$. (This should be zero. Is it? Briefly discuss this in the cell for this question.)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "3.580361673049448e-15\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(np.linalg.norm(r-b)) # Normalizing the difference between the two vectors we get ||r-b||"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "*We find out that the result obtained is very close to 0 ($3.51 * 10^{-15}$) but is not exactly 0 probably due to floating-point approximations done in computations*"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### 7. Print the determinant of A."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "214.0000000000001\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(np.linalg.det(A))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### 8. Repeat questions 2-7 for the matrix A1 with the elements\n",
+    "$ A1=\n",
+    "    \\begin{bmatrix}\n",
+    "        -1 & 3000 & 1 \\\\\n",
+    "        2000 & -1.5 & -2.5 \\\\\n",
+    "        -1999 & −2998.5 & 1.5\n",
+    "    \\end{bmatrix}\n",
+    "$\n",
+    "\n",
+    "\n",
+    "In a cell, describe and explain what you observe."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "2. Create a matrix A1 with the elements \n",
+    "$ A1=\n",
+    "    \\begin{bmatrix}\n",
+    "        -1 & 3000 & 1 \\\\\n",
+    "        2000 & -1.5 & -2.5 \\\\\n",
+    "        -1999 & -2998.5 & 1.5\n",
+    "    \\end{bmatrix}\n",
+    "$\n",
+    "and print it."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[-1.0000e+00  3.0000e+03  1.0000e+00]\n",
+      " [ 2.0000e+03 -1.5000e+00 -2.5000e+00]\n",
+      " [-1.9990e+03 -2.9985e+03  1.5000e+00]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "A1 = np.array([\n",
+    "    [-1, 3000, 1],\n",
+    "    [2000, -1.5, -2.5],\n",
+    "    [-1999, -2998.5, 1.5]\n",
+    "])\n",
+    "print(A1)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "3. Is the matrix A symmetric? Write your answer in a cell in the notebook and then check it with Python."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "*No, the matrix is symmetric since $A1 \\not= A1^T$. Here is the check:*"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "False\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(is_symmetric(A1))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "4. Compute $x$ as the solution of the linear system $Ax = b$ and print it."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[ 2.25135002e+13]\n",
+      " [-5.99729500e+12]\n",
+      " [ 1.80143985e+16]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "x1 = np.linalg.solve(A1,b)\n",
+    "print(x1)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "5. To check if the solution is correct, compute $r$ as the product $Ax$ and print it."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[-4.]\n",
+      " [-8.]\n",
+      " [ 8.]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "r1 = np.dot(A1, x1) \n",
+    "print(r1)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "6. Print the difference of $r$ and $b$ as $r−b$. (This should be zero. Is it? Briefly discuss this in the cell for this question.)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "1.4142135623730951\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(np.linalg.norm(r1-b)) # Normalizing the difference between the two vectors we get ||r-b||"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "*We find out that the result obtained is much more bigger than the one obtained with the matrix $M$. This highlight the fact that is very likely to have an error in computations, due to the fact that the matrix is **Ill-Conditioned**, i.e. $det(M1) \\approx 0$*"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "7. Print the determinant of A"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "1.3322672964832825e-09\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(np.linalg.det(A1))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "*Looking at the determinant of $A1$ we notice that is very close to zero ($1.33 * 10^{-9}$) confirming that the matrix $A1$ is **Ill-Conditioned** and so susceptible to errors in computations (as hypothesized in task 8.6).*"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "3.10.12",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
